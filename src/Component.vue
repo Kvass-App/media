@@ -30,7 +30,7 @@
       </template>
 
       <template v-if="selected" #preview>
-        <Description v-if="description" v-model="selectedSource.description" />
+        <Description v-if="description" v-model="selectedSource.description" :disabled="isDisabled" />
         <component :is="selected.typeConfig.components.Preview" :value="selected" :size="size" />
       </template>
 
