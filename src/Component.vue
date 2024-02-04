@@ -30,7 +30,18 @@
       </template>
 
       <template v-if="selected" #preview>
-        <Description v-if="description" v-model="selectedSource.description" :disabled="isDisabled" />
+        <Tags
+          v-if="tags"
+          :value="selectedSource.tags || []"
+          @input="($ev) => setMetadata('tags', $ev)"
+          :disabled="isDisabled"
+        />
+        <Description
+          v-if="description"
+          :value="selectedSource.description"
+          @input="($ev) => setMetadata('description', $ev)"
+          :disabled="isDisabled"
+        />
         <component :is="selected.typeConfig.components.Preview" :value="selected" :size="size" />
       </template>
 
@@ -65,6 +76,7 @@ import TypeSelector from './TypeSelector'
 import Types from './Types'
 import DropArea from './DropArea'
 import Description from './Description'
+import Tags from './Tags'
 
 import './icons'
 
@@ -97,6 +109,10 @@ export default {
     uploadOptions: {
       type: Object,
       default: () => ({}),
+    },
+    tags: {
+      type: Boolean,
+      default: false,
     },
     description: {
       type: Boolean,
@@ -187,6 +203,10 @@ export default {
       this.$emit('input', this.multiple ? [...value, ...[item]] : item)
       this.$nextTick(() => this.select(this.items.find((i) => i.url === item.url)))
     },
+    setMetadata(field, value) {
+      this.selectedSource[field] = value
+      this.$emit('input', this.value)
+    },
   },
   created() {
     this.id = this._uid
@@ -199,6 +219,7 @@ export default {
     TypeSelector,
     DropArea,
     Description,
+    Tags,
   },
 }
 </script>

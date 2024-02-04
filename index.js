@@ -25,6 +25,7 @@ const Options = {
     cancel: 'Cancel',
     select: 'Select',
     descriptionPlaceholder: 'Add caption...',
+    tagsPlaceholder: 'Add tag...',
     selectMessage: 'Select a type from the menu',
   },
 }
