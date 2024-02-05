@@ -7,7 +7,7 @@
         @input="($ev) => update($ev.target.value, i)"
         @focus="() => onFocus()"
         @blur="($ev) => onBlur($ev.target.value, i)"
-        @keypress.enter="($ev) => $ev.target.blur()"
+        @keypress.enter="add"
         placeholder="..."
         :size="getSize(val)"
       />
@@ -43,8 +43,7 @@ export default {
       this.$nextTick(() => Array.from(this.$el.querySelectorAll('input')).at(-1).focus())
     },
     update(val, i) {
-      if (val) this.value.splice(i, 1, val)
-      else this.remove(i)
+      this.value.splice(i, 1, val)
       this.$emit('input', this.value)
     },
     remove(i) {
@@ -86,7 +85,8 @@ export default {
   transition-duration: 100ms;
   transition-timing-function: ease;
 
-  .kvass-media-droparea:hover & {
+  .kvass-media-droparea:hover &,
+  &:has(input:focus-within) {
     opacity: 1;
     transform: translateX(0px);
   }
