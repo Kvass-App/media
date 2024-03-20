@@ -11,10 +11,10 @@
         placeholder="..."
         :size="getSize(val)"
       />
-      <FontAwesomeIcon :icon="['fa', 'times']" @click="() => remove(i)" />
+      <Icon :icon="['fa', 'times']" @click="() => remove(i)" />
     </span>
     <button v-if="!isActive" type="button" @click="add">
-      <FontAwesomeIcon :icon="['fa', 'tag']" />
+      <Icon :icon="['fa', 'tag']" />
       <span>{{ options.labels.tagsPlaceholder }}</span>
     </button>
   </div>
@@ -22,6 +22,7 @@
 
 <script>
 import { Options } from '../index'
+import Icon from '@kvass/vue2-icon'
 
 export default {
   props: {
@@ -60,6 +61,9 @@ export default {
       this.isActive = false
       if (!val) this.remove(i)
     },
+  },
+  components: {
+    Icon,
   },
 }
 </script>

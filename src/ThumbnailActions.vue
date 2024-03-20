@@ -1,7 +1,7 @@
 <template>
   <div class="kvass-media-thumbnail-actions">
     <div v-if="!disabled" class="kvass-media-thumbnail-actions__delete" @click="$emit('delete')">
-      <FontAwesomeIcon icon="trash" />
+      <Icon icon="trash" />
     </div>
     <component
       :is="download.component"
@@ -9,12 +9,13 @@
       v-bind="download.props"
       v-on="download.listeners"
     >
-      <FontAwesomeIcon icon="arrow-alt-circle-down" />
+      <Icon icon="arrow-alt-circle-down" />
     </component>
   </div>
 </template>
 
 <script>
+import Icon from '@kvass/vue2-icon'
 export default {
   props: {
     value: Object,
@@ -56,6 +57,9 @@ export default {
         listeners: {},
       }
     },
+  },
+  components: {
+    Icon,
   },
 }
 </script>

@@ -32,7 +32,7 @@
           <slot />
         </template>
 
-        <FontAwesomeIcon v-else icon="ban" size="lg" />
+        <Icon v-else icon="ban" size="lg" />
 
         <slot name="custom-message" />
       </div>
@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import Icon from '@kvass/vue2-icon'
 
 import { AttributeBoolean, Clone, IsAccepted } from './utils'
 import { Options } from '../index'
@@ -195,7 +195,7 @@ export default {
 
   components: {
     Uploader,
-    FontAwesomeIcon,
+    Icon,
     SlotHandler,
     Actions,
   },

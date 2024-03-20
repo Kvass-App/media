@@ -1,18 +1,16 @@
 {
   "name": "@kvass/media",
-  "version": "0.0.0-development",
+  "version": "1.5.4",
   "description": "Component for media upload",
   "main": "index.js",
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.35",
-    "@fortawesome/free-solid-svg-icons": "^5.15.3",
-    "@fortawesome/vue-fontawesome": "^2.0.2",
+    "@kvass/vue2-icon": "^1.0.3",
     "@kvass/card": "^1.0.3",
     "@linusborg/vue-simple-portal": "^0.1.5",
     "mime": "^3.0.0",
-    "vue-elder-button": "^1.6.7",
-    "vue-elder-dropdown": "^1.4.1",
-    "vue-elder-input": "^1.7.2",
+    "vue-elder-button": "^1.7.1",
+    "vue-elder-dropdown": "^1.5.6",
+    "vue-elder-input": "^1.9.3",
     "vue-elder-modal": "^1.0.5",
     "vue-youtube": "^1.4.0",
     "vuedraggable": "^2.24.3"

@@ -78,8 +78,6 @@ import DropArea from './DropArea'
 import Description from './Description'
 import Tags from './Tags'
 
-import './icons'
-
 export default {
   props: {
     value: [Array, Object],
