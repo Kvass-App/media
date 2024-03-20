@@ -1,7 +1,7 @@
 <template>
   <ButtonComponent type="button" class="image-create-trigger">
     <span>{{ label }}</span>
-    <Icon :icon="['fa', 'image']" class="ml-1"></Icon>
+    <Icon :icon="['fas', 'image']" class="ml-1"></Icon>
   </ButtonComponent>
 </template>
 
