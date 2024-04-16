@@ -259,9 +259,20 @@ export default {
     gap: 0.5rem;
 
     .kvass-media--inside & {
+      flex-wrap: nowrap;
       position: absolute;
-      right: 2rem;
-      bottom: 2rem;
+      --padding: 2rem;
+      bottom: var(--padding);
+      overflow-x: auto;
+      padding-inline: var(--padding);
+      max-width: 100%;
+      mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        black calc(0% + var(--padding)),
+        black calc(100% - var(--padding)),
+        transparent 100%
+      );
     }
   }
 }
