@@ -259,18 +259,19 @@ export default {
     gap: 0.5rem;
 
     .kvass-media--inside & {
+      --kvass-media-inside-padding: 2rem;
       flex-wrap: nowrap;
       position: absolute;
-      --padding: 2rem;
-      bottom: var(--padding);
+      padding-block-start: 1rem;
+      bottom: var(--kvass-media-inside-padding);
       overflow-x: auto;
-      padding-inline: var(--padding);
-      max-width: 100%;
+      padding-inline: var(--kvass-media-inside-padding);
+      max-width: 90%;
       mask-image: linear-gradient(
         to right,
         transparent 0%,
-        black calc(0% + var(--padding)),
-        black calc(100% - var(--padding)),
+        black calc(0% + var(--kvass-media-inside-padding)),
+        black calc(100% - var(--kvass-media-inside-padding)),
         transparent 100%
       );
     }
