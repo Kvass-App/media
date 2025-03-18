@@ -53,7 +53,13 @@
       </template>
     </DropArea>
     <slot name="bottom" />
-    <Draggable v-if="multiple" v-model="items" :disabled="!sortable || isDisabled" class="kvass-media__thumbnails">
+    <Draggable
+      v-if="multiple"
+      v-model="items"
+      :disabled="!sortable || isDisabled"
+      class="kvass-media__thumbnails"
+      @change="draggableChange"
+    >
       <Thumbnail
         v-for="(item, index) in items"
         :key="index"
@@ -184,6 +190,13 @@ export default {
     },
   },
   methods: {
+    draggableChange(val) {
+      if (!val || !val.moved) return
+      const element = val.moved.element
+      const item = this.items.find((i) => i.url === element.url)
+      if (!item) return
+      this.selected = item
+    },
     select(val) {
       if (!this.value) return (this.selected = null)
       if (this.multiple && !this.value.length) return (this.selected = null)
