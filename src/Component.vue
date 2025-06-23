@@ -67,8 +67,28 @@
         :disabled="isDisabled"
         @click="selected = item"
         @delete="remove(item)"
+        @set-focus="openFocusEditor"
       />
     </Draggable>
+
+    <Portal>
+      <ModalComponent :show="isFocusEditorVisible" @close="closeFocusEditor">
+        <Card theme="flat" tag="div">
+          <template #default>
+            <FocusPointEditor v-if="focusItem" :value="focusItem" ref="focusEditor" @save="saveFocusPoint" />
+          </template>
+          <template #footer>
+            <ButtonComponent :label="'Cancel'" type="button" @click="closeFocusEditor" />
+            <ButtonComponent
+              theme="primary"
+              :label="'Save'"
+              type="button"
+              @click="$refs.focusEditor.save()"
+            />
+          </template>
+        </Card>
+      </ModalComponent>
+    </Portal>
   </div>
 </template>
 
@@ -83,6 +103,12 @@ import Types from './Types'
 import DropArea from './DropArea'
 import Description from './Description'
 import Tags from './Tags'
+
+import FocusPointEditor from './FocusPointEditor.vue'
+import { ModalComponent } from 'vue-elder-modal'
+import { ButtonComponent } from 'vue-elder-button'
+import Card from '@kvass/card'
+import { Portal } from '@linusborg/vue-simple-portal'
 
 export default {
   props: {
@@ -141,6 +167,8 @@ export default {
       id: null,
       selected: null,
       isDragOver: false,
+      isFocusEditorVisible: false,
+      focusItem: null,
     }
   },
 
@@ -190,6 +218,23 @@ export default {
     },
   },
   methods: {
+    openFocusEditor(item) {
+      this.focusItem = item
+      this.isFocusEditorVisible = true
+    },
+    closeFocusEditor() {
+      this.isFocusEditorVisible = false
+      this.focusItem = null
+    },
+    saveFocusPoint(updatedItem) {
+      const index = this.value.findIndex(item => item.url === updatedItem.url);
+      if (index !== -1) {
+        const newValue = [...this.value];
+        newValue[index] = updatedItem;
+        this.$emit('input', newValue);
+      }
+      this.closeFocusEditor();
+    },
     draggableChange(val) {
       if (!val || !val.moved) return
       const element = val.moved.element
@@ -231,6 +276,11 @@ export default {
     DropArea,
     Description,
     Tags,
+    FocusPointEditor,
+    ModalComponent,
+    ButtonComponent,
+    Card,
+    Portal,
   },
 }
 </script>
