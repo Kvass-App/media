@@ -164,7 +164,7 @@ export default {
   &__marker-inner {
     width: 100%;
     height: 100%;
-    border: 2px solid white;
+   
     border-radius: 50%;
     background: #007bff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
