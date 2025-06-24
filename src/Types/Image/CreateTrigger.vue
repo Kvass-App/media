@@ -1,13 +1,13 @@
 <template>
   <ButtonComponent type="button" class="image-create-trigger">
     <span>{{ label }}</span>
-    <Icon :icon="['fas', 'image']" class="ml-1"></Icon>
+    <Icon icon="eye" class="ml-1"></Icon>
   </ButtonComponent>
 </template>
 
 <script>
 import { ButtonComponent } from 'vue-elder-button'
-import Icon from '@kvass/vue2-icon'
+import Icon from '../../Icon.vue'
 
 import { Options } from '../../../index'
 export default {
