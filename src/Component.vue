@@ -24,6 +24,7 @@
       :disabled="!hasImage || isDisabled"
       :upload-options="uploadOptions"
       :upload="upload"
+      :is-focus-point-mode="isFocusPointMode"
     >
       <template #default>
         <TypeSelector :value="typesComp" @add="addItem" :has-image="hasImage" />
@@ -31,18 +32,24 @@
 
       <template v-if="selected" #preview>
         <Tags
-          v-if="tags"
+          v-if="tags && !isFocusPointMode"
           :value="selectedSource.tags || []"
           @input="($ev) => setMetadata('tags', $ev)"
           :disabled="isDisabled"
         />
         <Description
-          v-if="description"
+          v-if="description && !isFocusPointMode"
           :value="selectedSource.description"
           @input="($ev) => setMetadata('description', $ev)"
           :disabled="isDisabled"
         />
-        <component :is="selected.typeConfig.components.Preview" :value="selected" :size="size" />
+        <component 
+          :is="selected.typeConfig.components.Preview" 
+          :value="selected" 
+          :size="size" 
+          @focus-point-changed="onFocusPointChanged"
+          @focus-point-mode-changed="onFocusPointModeChanged"
+        />
       </template>
 
       <template #drop-message>
@@ -75,7 +82,7 @@
 <script>
 import Draggable from 'vuedraggable'
 
-import { AttributeBoolean } from './utils'
+import { AttributeBoolean, setFocusPoint, removeFocusPoint } from './utils'
 import Thumbnail from './Thumbnail'
 import SlotHandler from './SlotHandler'
 import TypeSelector from './TypeSelector'
@@ -126,10 +133,24 @@ export default {
   watch: {
     value: {
       handler(val) {
-        if (!this.selected || !this.items.find((i) => i.url === this.selected.url)) this.select()
+        if (!this.selected || !this.items.find(i => i.url === this.selected.url)) {
+          this.select();
+        }
       },
-      immediate: true,
+      immediate: true
     },
+    selected: {
+      handler(val) {
+        // Selected changed
+      },
+      immediate: true
+    },
+    items: {
+      handler(val) {
+        // Items changed
+      },
+      immediate: true
+    }
   },
   provide() {
     return {
@@ -141,6 +162,7 @@ export default {
       id: null,
       selected: null,
       isDragOver: false,
+      isFocusPointMode: false,
     }
   },
 
@@ -198,9 +220,15 @@ export default {
       this.selected = item
     },
     select(val) {
-      if (!this.value) return (this.selected = null)
-      if (this.multiple && !this.value.length) return (this.selected = null)
-      if (val) return (this.selected = val)
+      if (!this.value) {
+        return (this.selected = null)
+      }
+      if (this.multiple && !this.value.length) {
+        return (this.selected = null)
+      }
+      if (val) {
+        return (this.selected = val)
+      }
       return (this.selected = this.items[0])
     },
     remove(item) {
@@ -217,6 +245,35 @@ export default {
     setMetadata(field, value) {
       this.selectedSource[field] = value
       this.$emit('input', this.value)
+    },
+    onFocusPointChanged(focusPoint) {
+      if (!this.selected) return
+      
+      // Oppdater selected item
+      this.selected = focusPoint 
+        ? setFocusPoint(this.selected, focusPoint)
+        : removeFocusPoint(this.selected)
+      
+      // Oppdater value basert på multiple/single mode
+      if (this.multiple && this.value) {
+        const updatedValue = this.value.map(item => 
+          item.url === this.selected.url 
+            ? (focusPoint ? setFocusPoint(item, focusPoint) : removeFocusPoint(item))
+            : item
+        )
+        this.$emit('input', updatedValue)
+      } else if (!this.multiple && this.value) {
+        const updatedValue = focusPoint 
+          ? setFocusPoint(this.value, focusPoint)
+          : removeFocusPoint(this.value)
+        this.$emit('input', updatedValue)
+      }
+      
+      this.$emit('focus-point-changed', focusPoint)
+    },
+    onFocusPointModeChanged(isFocusPointMode) {
+      this.isFocusPointMode = isFocusPointMode
+      this.$emit('focus-point-mode-changed', isFocusPointMode)
     },
   },
   created() {

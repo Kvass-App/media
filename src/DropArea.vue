@@ -13,7 +13,7 @@
     >
       <slot name="preview" />
 
-      <div v-if="!isDisabled" class="kvass-media-droparea__instruction">
+      <div v-if="!isDisabled && !isFocusPointMode" class="kvass-media-droparea__instruction">
         <input
           v-if="canUpload"
           :type="type"
@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import Icon from '@kvass/vue2-icon'
+import Icon from './Icon.vue'
 
 import { AttributeBoolean, Clone, IsAccepted } from './utils'
 import { Options } from '../index'
@@ -103,6 +103,10 @@ export default {
     selected: {
       type: Object,
       default: () => ({}),
+    },
+    isFocusPointMode: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
