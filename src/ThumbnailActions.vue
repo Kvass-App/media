@@ -9,13 +9,13 @@
       v-bind="download.props"
       v-on="download.listeners"
     >
-      <Icon icon="arrow-alt-circle-down" />
+      <Icon icon="download" />
     </component>
   </div>
 </template>
 
 <script>
-import Icon from '@kvass/vue2-icon'
+import Icon from './Icon.vue'
 export default {
   props: {
     value: Object,
