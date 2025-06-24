@@ -119,7 +119,6 @@ p {
 .component-wrapper {
   border: 2px dashed #ddd;
   border-radius: 20px;
-  padding: 20px;
   margin: 20px 0;
   
   width: 100%;
