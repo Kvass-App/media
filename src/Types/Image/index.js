@@ -1,6 +1,7 @@
 import CreateTrigger from './CreateTrigger'
 import Thumbnail from './Thumbnail'
 import Preview from './Preview'
+import FocusPoint from './FocusPoint'
 
 export default {
   name: 'Image',
@@ -11,5 +12,6 @@ export default {
     CreateTrigger,
     Thumbnail,
     Preview,
+    FocusPoint,
   },
 }
