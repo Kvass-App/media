@@ -20,10 +20,15 @@ export default {
 
   computed: {
     style() {
+      const backgroundPosition = this.value.focus
+        ? `${this.value.focus.x * 100}% ${this.value.focus.y * 100}%`
+        : 'center'
+
       return {
         padding: this.size === 'cover' ? '0' : '1rem',
         backgroundSize: this.size,
         backgroundImage: `url(${this.value.url})`,
+        backgroundPosition: backgroundPosition,
       }
     },
   },
