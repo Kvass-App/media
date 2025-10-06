@@ -10,12 +10,7 @@
     >
     </component>
 
-    <Actions
-      :value="value"
-      :disabled="disabled"
-      @delete="$emit('delete', value)" 
-      @set-focus="(item) => $emit('set-focus', item)" 
-    />
+    <Actions :value="value" :disabled="disabled" @delete="$emit('delete', value)" />
   </div>
 </template>
 

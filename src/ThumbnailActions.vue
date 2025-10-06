@@ -1,12 +1,5 @@
 <template>
   <div class="kvass-media-thumbnail-actions">
-    <div
-      v-if="!disabled && isImage"
-      class="kvass-media-thumbnail-actions__focus"
-      @click.stop="$emit('set-focus', value)"
-    >
-      <Icon icon="crosshairs" />
-    </div>
     <div v-if="!disabled" class="kvass-media-thumbnail-actions__delete" @click="$emit('delete')">
       <Icon icon="trash" />
     </div>
@@ -111,10 +104,6 @@ export default {
 
   &__download {
     background-color: GetVariable('primary');
-  }
-
-  &__focus {
-    background-color: GetVariable('action');
   }
 }
 </style>

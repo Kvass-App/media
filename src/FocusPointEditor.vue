@@ -1,19 +1,24 @@
-<template>
+<template class="focus-point-modal">
   <div class="focus-point-editor">
     <div class="focus-point-editor__main">
       <!-- Handles both mouch and phone touch input -->
       <div class="focus-point-editor__image-wrapper" ref="imageWrapper" @mousedown="onImageClick">
         <img :src="value.url" ref="image" @load="getImageDimensions" />
         <!-- First-time instructions for users -->
-        <div class="focus-point-editor__instruction" :class="{ 'is-hidden': hasInteracted}">
-          Click or drag to set the focus point
+        <div class="focus-point-editor__instruction" :class="{ 'is-hidden': hasInteracted }">
+          {{ label.dragInstructions }}
         </div>
-        <div class="focus-point-editor__handle" :class="{ 'is-dragging': isDragging}" :style="handleStyle" @mousedown.stop="onDragStart"></div>
+        <div
+          class="focus-point-editor__handle"
+          :class="{ 'is-dragging': isDragging }"
+          :style="handleStyle"
+          @mousedown.stop="onDragStart"
+        ></div>
       </div>
     </div>
     <div class="focus-point-editor__previews">
-      <h4>Focus Point Previews</h4>
-      <p>How the image will be cropped in different layouts.</p>
+      <h4>{{ label.focusPointTitle }}</h4>
+      <p>{{ label.focusPointDescription }}</p>
       <div class="focus-point-editor__preview-box" :style="previewStyle(16, 9)">
         <div class="focus-point-editor__preview-aspect">16:9</div>
       </div>
@@ -28,6 +33,8 @@
 </template>
 
 <script>
+import { Options } from '../index'
+
 export default {
   props: {
     value: {
@@ -40,6 +47,7 @@ export default {
     return {
       focus: { x: 0.5, y: 0.5 },
       imageDimensions: { width: 0, height: 0 },
+      wrapperDimensions: { width: 0, height: 0 },
       isDragging: false,
       // Used for the first-time instructions
       hasInteracted: false,
@@ -47,10 +55,26 @@ export default {
   },
   computed: {
     handleStyle() {
-      return {
-        left: `${this.focus.x * 100}%`,
-        top: `${this.focus.y * 100}%`,
+      if (!this.imageDimensions.width || !this.wrapperDimensions.width) {
+        return { left: '50%', top: '50%' }
       }
+
+      const offsetX = (this.wrapperDimensions.width - this.imageDimensions.width) / 2
+      const offsetY = (this.wrapperDimensions.height - this.imageDimensions.height) / 2
+
+      const handleLeftPx = offsetX + this.focus.x * this.imageDimensions.width
+      const handleTopPx = offsetY + this.focus.y * this.imageDimensions.height
+
+      return {
+        left: `${handleLeftPx}px`,
+        top: `${handleTopPx}px`,
+      }
+    },
+    options() {
+      return Options
+    },
+    label() {
+      return Options.labels
     },
   },
   methods: {
@@ -64,23 +88,31 @@ export default {
     getEventCoordinates(event) {
       // Gets coordinates for mouse and touch events, returns coordinates
       if (event.touches && event.touches[0]) {
-        return { x: event.touches[0].clientX, y: event.touches[0].clientY };
-      } return { x: event.clientX, y: event.clientY };
+        return { x: event.touches[0].clientX, y: event.touches[0].clientY }
+      }
+      return { x: event.clientX, y: event.clientY }
     },
     getImageDimensions() {
-      if (this.$refs.image) {
+      if (this.$refs.image && this.$refs.imageWrapper) {
         this.imageDimensions = {
           width: this.$refs.image.clientWidth,
           height: this.$refs.image.clientHeight,
+        }
+        this.wrapperDimensions = {
+          width: this.$refs.imageWrapper.clientWidth,
+          height: this.$refs.imageWrapper.clientHeight,
         }
       }
     },
     updateFocusPoint(event) {
       // Calculates and updates focus point based on events position
       if (!this.$refs.imageWrapper) return
-      const rect = this.$refs.imageWrapper.getBoundingClientRect()
-      let x = (event.clientX - rect.left) / rect.width
-      let y = (event.clientY - rect.top) / rect.height
+
+      const rect = this.$refs.image.getBoundingClientRect()
+      const coords = this.getEventCoordinates(event)
+
+      let x = (coords.x - rect.left) / rect.width
+      let y = (coords.y - rect.top) / rect.height
 
       // Calculate position as a percentage from 0 to 1
       this.focus.x = Math.max(0, Math.min(1, x))
@@ -105,7 +137,7 @@ export default {
       // Handles drag movement, updating focus point live
       if (this.isDragging) {
         // Prevents scrolling when dragging on phone
-        if (event.cancelable) event.preventDefault();
+        if (event.cancelable) event.preventDefault()
         this.updateFocusPoint(event)
       }
     },
@@ -139,6 +171,10 @@ export default {
 </script>
 
 <style lang="scss">
+.kvass-card--flat {
+  min-width: 75%;
+}
+
 .focus-point-editor {
   display: flex;
   gap: 2rem;
@@ -190,10 +226,10 @@ export default {
     white-space: nowrap;
     opacity: 1;
     transition: opacity 300ms ease;
-    
+
     &.is-hidden {
       opacity: 0;
-    };
+    }
   }
 
   &__handle {
@@ -271,7 +307,7 @@ export default {
     border-radius: 3px;
     position: relative;
     background-color: #f0f0f0;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
     // Make the first preview span 2 columns
     &:nth-of-type(1) {

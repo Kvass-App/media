@@ -30,6 +30,15 @@
       </template>
 
       <template v-if="selected" #preview>
+        <ButtonComponent
+          v-if="selectedIsImage"
+          type="button"
+          class="kvass-media__focus-trigger"
+          title="Set Focus Point"
+          :icon="['fas', 'wand-magic-sparkles']"
+          @click="openFocusEditor(selected)"
+        />
+
         <Tags
           v-if="tags"
           :value="selectedSource.tags || []"
@@ -67,8 +76,8 @@
         :disabled="isDisabled"
         @click="selected = item"
         @delete="remove(item)"
-        @set-focus="openFocusEditor"
       />
+      <!-- @set-focus="openFocusEditor" -->
     </Draggable>
 
     <Portal>
@@ -79,12 +88,7 @@
           </template>
           <template #footer>
             <ButtonComponent :label="'Cancel'" type="button" @click="closeFocusEditor" />
-            <ButtonComponent
-              theme="primary"
-              :label="'Save'"
-              type="button"
-              @click="$refs.focusEditor.save()"
-            />
+            <ButtonComponent theme="primary" :label="'Save'" type="button" @click="$refs.focusEditor.save()" />
           </template>
         </Card>
       </ModalComponent>
@@ -176,6 +180,9 @@ export default {
     hasImage() {
       return this.typesComp.some((item) => item.name === 'Image')
     },
+    selectedIsImage() {
+      return this.selected && this.selected.type && this.selected.type.startsWith('image/')
+    },
     selectedSource() {
       if (!this.selected) return
 
@@ -197,13 +204,7 @@ export default {
       },
       set(val) {
         if (!this.multiple) return
-        this.$emit(
-          'input',
-          val.map((v) => {
-            let { selected, typeConfig, ...rest } = v
-            return rest
-          }),
-        )
+        this.$emit('input', val.map(this.sanitizeItem))
       },
     },
     isDisabled: AttributeBoolean('disabled'),
@@ -218,6 +219,10 @@ export default {
     },
   },
   methods: {
+    sanitizeItem(item) {
+      const { selected, typeConfig, ...rest } = item
+      return rest
+    },
     openFocusEditor(item) {
       this.focusItem = item
       this.isFocusEditorVisible = true
@@ -227,13 +232,15 @@ export default {
       this.focusItem = null
     },
     saveFocusPoint(updatedItem) {
-      const index = this.value.findIndex(item => item.url === updatedItem.url);
-      if (index !== -1) {
-        const newValue = [...this.value];
-        newValue[index] = updatedItem;
-        this.$emit('input', newValue);
+      const cleanItem = this.sanitizeItem(updatedItem)
+
+      if (this.multiple) {
+        const newValue = this.value.map((item) => (item.url === cleanItem.url ? cleanItem : item))
+        this.$emit('input', newValue)
+      } else {
+        this.$emit('input', cleanItem)
       }
-      this.closeFocusEditor();
+      this.closeFocusEditor()
     },
     draggableChange(val) {
       if (!val || !val.moved) return
@@ -259,9 +266,20 @@ export default {
       this.$emit('input', this.multiple ? [...value, ...[item]] : item)
       this.$nextTick(() => this.select(this.items.find((i) => i.url === item.url)))
     },
-    setMetadata(field, value) {
-      this.selectedSource[field] = value
-      this.$emit('input', this.value)
+    setMetadata(field, newFieldValue) {
+      if (!this.selected) return
+
+      const updatedItem = {
+        ...this.selectedSource,
+        [field]: newFieldValue,
+      }
+
+      if (this.multiple) {
+        const newValue = this.value.map((item) => (item.url === updatedItem.url ? updatedItem : item))
+        this.$emit('input', newValue.map(this.sanitizeItem))
+      } else {
+        this.$emit('input', this.sanitizeItem(updatedItem))
+      }
     },
   },
   created() {
@@ -293,6 +311,24 @@ export default {
   display: flex;
   flex-direction: column;
   text-align: left;
+
+  &__focus-trigger {
+    position: absolute;
+    z-index: 999;
+    top: 0.75rem;
+    right: 0.75rem;
+
+    display: flex;
+    height: 45px;
+    width: 45px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    transition: all 0.2s;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
 
   &__label {
     font-weight: bold;
