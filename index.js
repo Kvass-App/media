@@ -27,6 +27,9 @@ const Options = {
     descriptionPlaceholder: 'Add caption...',
     tagsPlaceholder: 'Add tag...',
     selectMessage: 'Select a type from the menu',
+    dragInstructions: 'Click or drag to set the focus point',
+    focusPointTitle: 'Focus Point Previews',
+    focusPointDescription: 'How the image will be cropped in different layouts.',
   },
 }
 

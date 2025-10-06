@@ -30,6 +30,14 @@
       </template>
 
       <template v-if="selected" #preview>
+        <ButtonComponent
+          v-if="selectedIsImage"
+          type="button"
+          class="kvass-media__focus-trigger"
+          :icon="['fas', 'wand-magic-sparkles']"
+          @click="openFocusEditor(selected)"
+        />
+
         <Tags
           v-if="tags"
           :value="selectedSource.tags || []"
@@ -68,7 +76,22 @@
         @click="selected = item"
         @delete="remove(item)"
       />
+      <!-- @set-focus="openFocusEditor" -->
     </Draggable>
+
+    <Portal>
+      <ModalComponent :show="isFocusEditorVisible" @close="closeFocusEditor">
+        <Card theme="flat" tag="div" class="kvass-media__focus-point-modal">
+          <template #default>
+            <FocusPointEditor v-if="focusItem" :value="focusItem" ref="focusEditor" @save="saveFocusPoint" />
+          </template>
+          <template #footer>
+            <ButtonComponent :label="'Cancel'" type="button" @click="closeFocusEditor" />
+            <ButtonComponent theme="primary" :label="'Save'" type="button" @click="$refs.focusEditor.save()" />
+          </template>
+        </Card>
+      </ModalComponent>
+    </Portal>
   </div>
 </template>
 
@@ -83,6 +106,12 @@ import Types from './Types'
 import DropArea from './DropArea'
 import Description from './Description'
 import Tags from './Tags'
+
+import FocusPointEditor from './FocusPointEditor.vue'
+import { ModalComponent } from 'vue-elder-modal'
+import { ButtonComponent } from 'vue-elder-button'
+import Card from '@kvass/card'
+import { Portal } from '@linusborg/vue-simple-portal'
 
 export default {
   props: {
@@ -141,12 +170,17 @@ export default {
       id: null,
       selected: null,
       isDragOver: false,
+      isFocusEditorVisible: false,
+      focusItem: null,
     }
   },
 
   computed: {
     hasImage() {
       return this.typesComp.some((item) => item.name === 'Image')
+    },
+    selectedIsImage() {
+      return this.selected && this.selected.type && this.selected.type.startsWith('image/')
     },
     selectedSource() {
       if (!this.selected) return
@@ -169,13 +203,7 @@ export default {
       },
       set(val) {
         if (!this.multiple) return
-        this.$emit(
-          'input',
-          val.map((v) => {
-            let { selected, typeConfig, ...rest } = v
-            return rest
-          }),
-        )
+        this.$emit('input', val.map(this.sanitizeItem))
       },
     },
     isDisabled: AttributeBoolean('disabled'),
@@ -190,6 +218,29 @@ export default {
     },
   },
   methods: {
+    sanitizeItem(item) {
+      const { selected, typeConfig, ...rest } = item
+      return rest
+    },
+    openFocusEditor(item) {
+      this.focusItem = item
+      this.isFocusEditorVisible = true
+    },
+    closeFocusEditor() {
+      this.isFocusEditorVisible = false
+      this.focusItem = null
+    },
+    saveFocusPoint(updatedItem) {
+      const cleanItem = this.sanitizeItem(updatedItem)
+
+      if (this.multiple) {
+        const newValue = this.value.map((item) => (item.url === cleanItem.url ? cleanItem : item))
+        this.$emit('input', newValue)
+      } else {
+        this.$emit('input', cleanItem)
+      }
+      this.closeFocusEditor()
+    },
     draggableChange(val) {
       if (!val || !val.moved) return
       const element = val.moved.element
@@ -214,9 +265,20 @@ export default {
       this.$emit('input', this.multiple ? [...value, ...[item]] : item)
       this.$nextTick(() => this.select(this.items.find((i) => i.url === item.url)))
     },
-    setMetadata(field, value) {
-      this.selectedSource[field] = value
-      this.$emit('input', this.value)
+    setMetadata(field, newFieldValue) {
+      if (!this.selected) return
+
+      const updatedItem = {
+        ...this.selectedSource,
+        [field]: newFieldValue,
+      }
+
+      if (this.multiple) {
+        const newValue = this.value.map((item) => (item.url === updatedItem.url ? updatedItem : item))
+        this.$emit('input', newValue.map(this.sanitizeItem))
+      } else {
+        this.$emit('input', this.sanitizeItem(updatedItem))
+      }
     },
   },
   created() {
@@ -231,6 +293,11 @@ export default {
     DropArea,
     Description,
     Tags,
+    FocusPointEditor,
+    ModalComponent,
+    ButtonComponent,
+    Card,
+    Portal,
   },
 }
 </script>
@@ -243,6 +310,24 @@ export default {
   display: flex;
   flex-direction: column;
   text-align: left;
+
+  &__focus-trigger {
+    position: absolute;
+    z-index: 999;
+    top: 0.75rem;
+    right: 0.75rem;
+
+    display: flex;
+    height: 45px;
+    width: 45px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    transition: all 0.2s;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
 
   &__label {
     font-weight: bold;

@@ -22,6 +22,9 @@ export default {
     disabled: Boolean,
   },
   computed: {
+    isImage() {
+      return this.value.type && this.value.type.startsWith('image/')
+    },
     download() {
       if (this.value.type.startsWith('image/'))
         return {
