@@ -34,7 +34,6 @@
           v-if="selectedIsImage"
           type="button"
           class="kvass-media__focus-trigger"
-          title="Set Focus Point"
           :icon="['fas', 'wand-magic-sparkles']"
           @click="openFocusEditor(selected)"
         />
@@ -82,7 +81,7 @@
 
     <Portal>
       <ModalComponent :show="isFocusEditorVisible" @close="closeFocusEditor">
-        <Card theme="flat" tag="div">
+        <Card theme="flat" tag="div" class="kvass-media__focus-point-modal">
           <template #default>
             <FocusPointEditor v-if="focusItem" :value="focusItem" ref="focusEditor" @save="saveFocusPoint" />
           </template>

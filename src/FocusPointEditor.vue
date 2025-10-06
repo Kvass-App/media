@@ -171,7 +171,7 @@ export default {
 </script>
 
 <style lang="scss">
-.kvass-card--flat {
+.kvass-media__focus-point-modal {
   min-width: 75%;
 }
 
