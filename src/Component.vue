@@ -31,7 +31,7 @@
 
       <template v-if="selected" #preview>
         <ButtonComponent
-          v-if="selectedIsImage"
+          v-if="selectedIsImage && enableFocusPoint"
           type="button"
           class="kvass-media__focus-trigger"
           :icon="['fas', 'wand-magic-sparkles']"
@@ -76,7 +76,6 @@
         @click="selected = item"
         @delete="remove(item)"
       />
-      <!-- @set-focus="openFocusEditor" -->
     </Draggable>
 
     <Portal>
@@ -86,8 +85,8 @@
             <FocusPointEditor v-if="focusItem" :value="focusItem" ref="focusEditor" @save="saveFocusPoint" />
           </template>
           <template #footer>
-            <ButtonComponent :label="'Cancel'" type="button" @click="closeFocusEditor" />
-            <ButtonComponent theme="primary" :label="'Save'" type="button" @click="$refs.focusEditor.save()" />
+            <ButtonComponent :label="labels.cancel" type="button" @click="closeFocusEditor" />
+            <ButtonComponent theme="primary" :label="labels.save" type="button" @click="$refs.focusEditor.save()" />
           </template>
         </Card>
       </ModalComponent>
@@ -112,6 +111,7 @@ import { ModalComponent } from 'vue-elder-modal'
 import { ButtonComponent } from 'vue-elder-button'
 import Card from '@kvass/card'
 import { Portal } from '@linusborg/vue-simple-portal'
+import { Options } from '../index'
 
 export default {
   props: {
@@ -150,6 +150,10 @@ export default {
     description: {
       type: Boolean,
       default: true,
+    },
+    enableFocusPoint: {
+      type: Boolean,
+      default: false,
     },
   },
   watch: {
@@ -216,6 +220,9 @@ export default {
         })
         .filter(Boolean)
     },
+    labels() {
+      return Options.labels
+    },
   },
   methods: {
     sanitizeItem(item) {
@@ -231,6 +238,8 @@ export default {
       this.focusItem = null
     },
     saveFocusPoint(updatedItem) {
+      this.selected = updatedItem
+
       const cleanItem = this.sanitizeItem(updatedItem)
 
       if (this.multiple) {
