@@ -85,8 +85,20 @@
             <FocusPointEditor v-if="focusItem" :value="focusItem" ref="focusEditor" @save="saveFocusPoint" />
           </template>
           <template #footer>
-            <ButtonComponent :label="labels.cancel" type="button" @click="closeFocusEditor" />
-            <ButtonComponent theme="primary" :label="labels.save" type="button" @click="$refs.focusEditor.save()" />
+            <ButtonComponent :label="labels.cancel" type="button" @click="closeFocusEditor" :icon="['fal', 'times']" />
+            <ButtonComponent
+              :label="labels.resetFocusPoint"
+              type="button"
+              @click="$refs.focusEditor.reset()"
+              :icon="['fal', 'undo']"
+            />
+            <ButtonComponent
+              theme="primary"
+              :label="labels.save"
+              type="button"
+              @click="$refs.focusEditor.save()"
+              :icon="['fal', 'arrow-to-bottom']"
+            />
           </template>
         </Card>
       </ModalComponent>
