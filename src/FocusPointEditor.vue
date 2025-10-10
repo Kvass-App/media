@@ -45,7 +45,7 @@ export default {
   data() {
     // Focus point is stored as percentage that work at any screen size
     return {
-      focus: { x: 0.5, y: 0.5 },
+      internalFocus: { x: 0.5, y: 0.5 },
       imageDimensions: { width: 0, height: 0 },
       wrapperDimensions: { width: 0, height: 0 },
       isDragging: false,
@@ -53,36 +53,47 @@ export default {
       hasInteracted: false,
     }
   },
+  watch: {
+    value: {
+      handler(newValue) {
+        if (newValue && newValue.focus) {
+          this.internalFocus = { ...newValue.focus }
+        } else {
+          this.internalFocus = { x: 0.5, y: 0.5 }
+        }
+      },
+      immediate: true,
+    },
+  },
   computed: {
     handleStyle() {
       if (!this.imageDimensions.width || !this.wrapperDimensions.width) {
         return { left: '50%', top: '50%' }
       }
-
       const offsetX = (this.wrapperDimensions.width - this.imageDimensions.width) / 2
       const offsetY = (this.wrapperDimensions.height - this.imageDimensions.height) / 2
-
-      const handleLeftPx = offsetX + this.focus.x * this.imageDimensions.width
-      const handleTopPx = offsetY + this.focus.y * this.imageDimensions.height
+      const handleLeftPx = offsetX + this.internalFocus.x * this.imageDimensions.width
+      const handleTopPx = offsetY + this.internalFocus.y * this.imageDimensions.height
 
       return {
         left: `${handleLeftPx}px`,
         top: `${handleTopPx}px`,
       }
     },
-    options() {
-      return Options
-    },
     label() {
       return Options.labels
+    },
+    isCentered() {
+      return this.internalFocus.x === 0.5 && this.internalFocus.y === 0.5
     },
   },
   methods: {
     previewStyle(w, h) {
+      const position = `${this.internalFocus.x * 100}% ${this.internalFocus.y * 100}%`
       return {
         'padding-top': `${(h / w) * 100}%`,
         'background-image': `url(${this.value.url})`,
-        'background-position': `${this.focus.x * 100}% ${this.focus.y * 100}%`,
+        'background-position': position,
       }
     },
     getEventCoordinates(event) {
@@ -115,8 +126,12 @@ export default {
       let y = (coords.y - rect.top) / rect.height
 
       // Calculate position as a percentage from 0 to 1
-      this.focus.x = Math.max(0, Math.min(1, x))
-      this.focus.y = Math.max(0, Math.min(1, y))
+      this.internalFocus.x = Math.max(0, Math.min(1, x))
+      this.internalFocus.y = Math.max(0, Math.min(1, y))
+    },
+    reset() {
+      this.internalFocus = { x: 0.5, y: 0.5 }
+      this.hasInteracted = true
     },
     onImageClick(event) {
       // Update focus point if users clicks on background and not drags
@@ -150,14 +165,10 @@ export default {
       window.removeEventListener('touchend', this.onDragEnd)
     },
     save() {
-      this.$emit('save', { ...this.value, focus: this.focus })
+      const finalFocus = this.isCentered ? null : this.internalFocus
+
+      this.$emit('save', { ...this.value, focus: finalFocus })
     },
-  },
-  created() {
-    // Initialize the editor with an already existing middle focus point
-    if (this.value.focus) {
-      this.focus = { ...this.value.focus }
-    }
   },
   mounted() {
     // @load listener handles initial setup
