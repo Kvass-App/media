@@ -147,7 +147,6 @@ import SlotHandler from './SlotHandler'
 import TypeSelector from './TypeSelector'
 import Types from './Types'
 import DropArea from './DropArea'
-import Description from './Description'
 import Tags from './Tags'
 
 import FocusPointEditor from './FocusPointEditor.vue'
@@ -221,8 +220,6 @@ export default {
       isDragOver: false,
       isFocusEditorVisible: false,
       focusItem: null,
-      isAltEditorVisible: false,
-      altEditingItem: null,
       isMetadataEditorVisible: false,
       metadataEditingItem: null,
     }
@@ -372,7 +369,6 @@ export default {
     SlotHandler,
     TypeSelector,
     DropArea,
-    Description,
     Tags,
     FocusPointEditor,
     ImageMetadataEditor,
@@ -398,24 +394,6 @@ export default {
     z-index: 999;
     top: 0.75rem;
     right: 0.75rem;
-
-    display: flex;
-    height: 45px;
-    width: 45px;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
-    transition: all 0.2s;
-
-    &:hover {
-      transform: scale(1.1);
-    }
-  }
-
-  &__alt-trigger {
-    position: absolute;
-    z-index: 999;
-    top: 0.75rem;
-    left: 0.75rem;
 
     display: flex;
     height: 45px;
