@@ -52,7 +52,8 @@
           @input="($ev) => setMetadata('tags', $ev)"
           :disabled="isDisabled"
         />
-        <component :is="selected.typeConfig.components.Preview" :value="selected" :size="size" />
+
+        <component :is="selected.typeConfig.components.Preview" :value="selectedSource" :size="size" />
       </template>
 
       <template #drop-message>
