@@ -10,16 +10,16 @@
       <div class="kvass-media__form-group">
         <div class="kvass-media__label-wrapper">
           <label class="kvass-media__label">
-            {{ labels.descriptionPlaceholder || 'Caption' }}
+            {{ labels.descriptionPlaceholder }}
           </label>
           <span class="kvass-media__sublabel">
-            {{ labels.captionDescription || 'Synlig tekst som vises under bildet.' }}
+            {{ labels.captionDescription }}
           </span>
         </div>
         <textarea
           v-model="internalCaption"
           class="image-metadata-editor__input"
-          :placeholder="labels.descriptionPlaceholder"
+          :placeholder="labels.descriptionPlaceholder || '...'"
           rows="4"
         ></textarea>
       </div>
@@ -27,17 +27,17 @@
       <div class="kvass-media__form-group">
         <div class="kvass-media__label-wrapper">
           <label class="kvass-media__label">
-            {{ labels.altTextLabel || 'Alt tekst' }}
+            {{ labels.altTextLabel }}
           </label>
           <span class="kvass-media__sublabel">
-            {{ labels.altTextDescription || 'Beskrivelse for skjermlesere og SEO (ikke synlig på siden).' }}
+            {{ labels.altTextDescription }}
           </span>
         </div>
         <textarea
           v-model="internalAlt"
           class="image-metadata-editor__textarea"
           rows="4"
-          :placeholder="labels.altTextPlaceholder || 'Beskriv bilde...'"
+          :placeholder="labels.altTextPlaceholder || '...'"
         ></textarea>
       </div>
     </div>

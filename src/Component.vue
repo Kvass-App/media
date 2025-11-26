@@ -44,7 +44,6 @@
           class="kvass-media__info-trigger"
           :icon="['fas', 'message-text']"
           @click="openMetadataEditor(selected)"
-          :title="labels.editInfo || 'Edit caption and alt text'"
         />
 
         <Tags
