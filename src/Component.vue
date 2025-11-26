@@ -81,7 +81,7 @@
     </Draggable>
 
     <Portal>
-      <ModalComponent :show="isFocusEditorVisible" @close="closeFocusEditor">
+      <ModalComponent :show="Boolean(focusItem)" @close="closeFocusEditor">
         <Card theme="flat" tag="div" class="kvass-media__focus-point-modal">
           <template #default>
             <FocusPointEditor v-if="focusItem" :value="focusItem" ref="focusEditor" @save="saveFocusPoint" />
@@ -107,7 +107,7 @@
     </Portal>
 
     <Portal>
-      <ModalComponent :show="isMetadataEditorVisible" @close="closeMetadataEditor">
+      <ModalComponent :show="Boolean(metadataEditingItem)" @close="closeMetadataEditor">
         <Card theme="flat" tag="div" class="kvass-media__modal-card">
           <template #default>
             <ImageMetadataEditor
@@ -218,9 +218,7 @@ export default {
       id: null,
       selected: null,
       isDragOver: false,
-      isFocusEditorVisible: false,
       focusItem: null,
-      isMetadataEditorVisible: false,
       metadataEditingItem: null,
     }
   },
@@ -277,10 +275,8 @@ export default {
     },
     openFocusEditor(item) {
       this.focusItem = item
-      this.isFocusEditorVisible = true
     },
     closeFocusEditor() {
-      this.isFocusEditorVisible = false
       this.focusItem = null
     },
     saveFocusPoint(updatedItem) {
@@ -298,10 +294,8 @@ export default {
     },
     openMetadataEditor(item) {
       this.metadataEditingItem = item
-      this.isMetadataEditorVisible = true
     },
     closeMetadataEditor() {
-      this.isMetadataEditorVisible = false
       this.metadataEditingItem = null
     },
     saveMetadata(updatedItem) {
