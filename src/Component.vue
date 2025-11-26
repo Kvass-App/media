@@ -38,16 +38,19 @@
           @click="openFocusEditor(selected)"
         />
 
+        <ButtonComponent
+          v-if="selectedIsImage"
+          type="button"
+          class="kvass-media__info-trigger"
+          :icon="['fas', 'message-text']"
+          @click="openMetadataEditor(selected)"
+          :title="labels.editInfo || 'Edit caption and alt text'"
+        />
+
         <Tags
           v-if="tags"
           :value="selectedSource.tags || []"
           @input="($ev) => setMetadata('tags', $ev)"
-          :disabled="isDisabled"
-        />
-        <Description
-          v-if="description"
-          :value="selectedSource.description"
-          @input="($ev) => setMetadata('description', $ev)"
           :disabled="isDisabled"
         />
         <component :is="selected.typeConfig.components.Preview" :value="selected" :size="size" />
@@ -103,6 +106,36 @@
         </Card>
       </ModalComponent>
     </Portal>
+
+    <Portal>
+      <ModalComponent :show="isMetadataEditorVisible" @close="closeMetadataEditor">
+        <Card theme="flat" tag="div" class="kvass-media__modal-card">
+          <template #default>
+            <ImageMetadataEditor
+              v-if="metadataEditingItem"
+              :value="metadataEditingItem"
+              ref="metadataEditor"
+              @save="saveMetadata"
+            />
+          </template>
+          <template #footer>
+            <ButtonComponent
+              :label="labels.cancel"
+              type="button"
+              @click="closeMetadataEditor"
+              :icon="['fal', 'times']"
+            />
+            <ButtonComponent
+              theme="primary"
+              :label="labels.save"
+              type="button"
+              @click="$refs.metadataEditor.save()"
+              :icon="['fal', 'check']"
+            />
+          </template>
+        </Card>
+      </ModalComponent>
+    </Portal>
   </div>
 </template>
 
@@ -119,6 +152,7 @@ import Description from './Description'
 import Tags from './Tags'
 
 import FocusPointEditor from './FocusPointEditor.vue'
+import ImageMetadataEditor from './ImageMetadataEditor.vue'
 import { ModalComponent } from 'vue-elder-modal'
 import { ButtonComponent } from 'vue-elder-button'
 import Card from '@kvass/card'
@@ -188,6 +222,10 @@ export default {
       isDragOver: false,
       isFocusEditorVisible: false,
       focusItem: null,
+      isAltEditorVisible: false,
+      altEditingItem: null,
+      isMetadataEditorVisible: false,
+      metadataEditingItem: null,
     }
   },
 
@@ -262,6 +300,29 @@ export default {
       }
       this.closeFocusEditor()
     },
+    openMetadataEditor(item) {
+      this.metadataEditingItem = item
+      this.isMetadataEditorVisible = true
+    },
+    closeMetadataEditor() {
+      this.isMetadataEditorVisible = false
+      this.metadataEditingItem = null
+    },
+    saveMetadata(updatedItem) {
+      if (this.selected && this.selected.url === updatedItem.url) {
+        this.selected = updatedItem
+      }
+
+      const cleanItem = this.sanitizeItem(updatedItem)
+
+      if (this.multiple) {
+        const newValue = this.value.map((item) => (item.url === cleanItem.url ? cleanItem : item))
+        this.$emit('input', newValue)
+      } else {
+        this.$emit('input', cleanItem)
+      }
+      this.closeMetadataEditor()
+    },
     draggableChange(val) {
       if (!val || !val.moved) return
       const element = val.moved.element
@@ -315,6 +376,7 @@ export default {
     Description,
     Tags,
     FocusPointEditor,
+    ImageMetadataEditor,
     ModalComponent,
     ButtonComponent,
     Card,
@@ -337,6 +399,42 @@ export default {
     z-index: 999;
     top: 0.75rem;
     right: 0.75rem;
+
+    display: flex;
+    height: 45px;
+    width: 45px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    transition: all 0.2s;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+
+  &__alt-trigger {
+    position: absolute;
+    z-index: 999;
+    top: 0.75rem;
+    left: 0.75rem;
+
+    display: flex;
+    height: 45px;
+    width: 45px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    transition: all 0.2s;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+
+  &__info-trigger {
+    position: absolute;
+    z-index: 999;
+    top: 0.75rem;
+    right: 4.5rem;
 
     display: flex;
     height: 45px;
