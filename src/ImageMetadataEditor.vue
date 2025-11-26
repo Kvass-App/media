@@ -1,12 +1,12 @@
 <template>
-  <div class="image-metadata-editor">
-    <div class="image-metadata-editor__preview">
-      <div class="image-metadata-editor__image-wrapper">
+  <div class="kvass-media-image-metadata-editor">
+    <div class="kvass-media-image-metadata-editor__preview">
+      <div class="kvass-media-image-metadata-editor__image-wrapper">
         <img :src="value.url" alt="" />
       </div>
     </div>
 
-    <div class="image-metadata-editor__form">
+    <div class="kvass-media-image-metadata-editor__form">
       <div class="kvass-media__form-group">
         <div class="kvass-media__label-wrapper">
           <label class="kvass-media__label">
@@ -18,7 +18,7 @@
         </div>
         <textarea
           v-model="internalCaption"
-          class="image-metadata-editor__input"
+          class="kvass-media-image-metadata-editor__input"
           :placeholder="labels.descriptionPlaceholder || '...'"
           rows="4"
         ></textarea>
@@ -35,7 +35,7 @@
         </div>
         <textarea
           v-model="internalAlt"
-          class="image-metadata-editor__textarea"
+          class="kvass-media-image-metadata-editor__textarea"
           rows="4"
           :placeholder="labels.altTextPlaceholder || '...'"
         ></textarea>
@@ -89,7 +89,7 @@ export default {
 <style lang="scss">
 @import './main';
 
-.image-metadata-editor {
+.kvass-media-image-metadata-editor {
   display: flex;
   gap: 2rem;
   padding: 1rem;
