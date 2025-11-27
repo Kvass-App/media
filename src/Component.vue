@@ -48,14 +48,6 @@
           />
         </div>
 
-        <ButtonComponent
-          v-if="selectedIsImage"
-          type="button"
-          class="kvass-media__info-trigger"
-          :icon="['fas', 'message-text']"
-          @click="openMetadataEditor(selected)"
-        />
-
         <Tags
           v-if="tags"
           :value="selectedSource.tags || []"
