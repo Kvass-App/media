@@ -30,13 +30,23 @@
       </template>
 
       <template v-if="selected" #preview>
-        <ButtonComponent
-          v-if="selectedIsImage && enableFocusPoint"
-          type="button"
-          class="kvass-media__focus-trigger"
-          :icon="['fas', 'wand-magic-sparkles']"
-          @click="openFocusEditor(selected)"
-        />
+        <div class="kvass-media__actions">
+          <ButtonComponent
+            v-if="selectedIsImage && enableFocusPoint"
+            type="button"
+            class="kvass-media__action-btn"
+            :icon="['fas', 'wand-magic-sparkles']"
+            @click="openFocusEditor(selected)"
+          />
+
+          <ButtonComponent
+            v-if="selectedIsImage && enableAlt"
+            type="button"
+            class="kvass-media__action-btn"
+            :icon="['fas', 'message-text']"
+            @click="openMetadataEditor(selected)"
+          />
+        </div>
 
         <Tags
           v-if="tags"
@@ -103,6 +113,41 @@
         </Card>
       </ModalComponent>
     </Portal>
+
+    <Portal>
+      <ModalComponent
+        :show="Boolean(metadataEditingItem)"
+        @close="closeMetadataEditor""
+      >
+        <Card theme="flat" tag="div" class="kvass-media__modal-card">
+          <template #default>
+            <ImageMetadataEditor
+              v-if="metadataEditingItem"
+              :value="metadataEditingItem"
+              ref="metadataEditor"
+              @save="saveMetadata"
+              :enableDescription="enableDescription"
+              :enableAlt="enableAlt"
+            />
+          </template>
+          <template #footer>
+            <ButtonComponent
+              :label="labels.cancel"
+              type="button"
+              @click="closeMetadataEditor"
+              :icon="['fal', 'times']"
+            />
+            <ButtonComponent
+              theme="primary"
+              :label="labels.save"
+              type="button"
+              @click="$refs.metadataEditor.save()"
+              :icon="['fal', 'check']"
+            />
+          </template>
+        </Card>
+      </ModalComponent>
+    </Portal>
   </div>
 </template>
 
@@ -159,13 +204,17 @@ export default {
       type: Boolean,
       default: false,
     },
-    description: {
+    enableDescription: {
       type: Boolean,
       default: true,
     },
     enableFocusPoint: {
       type: Boolean,
       default: false,
+    },
+    enableAlt: {
+      type: Boolean,
+      default: true,
     },
   },
   watch: {
@@ -332,15 +381,25 @@ export default {
   flex-direction: column;
   text-align: left;
 
-  &__focus-trigger {
+  &__actions {
     position: absolute;
-    z-index: 999;
     top: 0.75rem;
     right: 0.75rem;
-
+    z-index: 10;
     display: flex;
-    height: 45px;
+    gap: .5rem;
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  &__action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 45px;
+    height: 45px;
     background-color: rgba(0, 0, 0, 0.5);
     color: white;
     transition: all 0.2s;
