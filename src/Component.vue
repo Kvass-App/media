@@ -48,19 +48,22 @@
           />
         </div>
 
+        <ButtonComponent
+          v-if="selectedIsImage"
+          type="button"
+          class="kvass-media__info-trigger"
+          :icon="['fas', 'message-text']"
+          @click="openMetadataEditor(selected)"
+        />
+
         <Tags
           v-if="tags"
           :value="selectedSource.tags || []"
           @input="($ev) => setMetadata('tags', $ev)"
           :disabled="isDisabled"
         />
-        <Description
-          v-if="description"
-          :value="selectedSource.description"
-          @input="($ev) => setMetadata('description', $ev)"
-          :disabled="isDisabled"
-        />
-        <component :is="selected.typeConfig.components.Preview" :value="selected" :size="size" />
+
+        <component :is="selected.typeConfig.components.Preview" :value="selectedSource" :size="size" />
       </template>
 
       <template #drop-message>
@@ -89,7 +92,7 @@
     </Draggable>
 
     <Portal>
-      <ModalComponent :show="isFocusEditorVisible" @close="closeFocusEditor">
+      <ModalComponent :show="Boolean(focusItem)" @close="closeFocusEditor">
         <Card theme="flat" tag="div" class="kvass-media__focus-point-modal">
           <template #default>
             <FocusPointEditor v-if="focusItem" :value="focusItem" ref="focusEditor" @save="saveFocusPoint" />
@@ -115,10 +118,7 @@
     </Portal>
 
     <Portal>
-      <ModalComponent
-        :show="Boolean(metadataEditingItem)"
-        @close="closeMetadataEditor""
-      >
+      <ModalComponent :show="Boolean(metadataEditingItem)" @close="closeMetadataEditor">
         <Card theme="flat" tag="div" class="kvass-media__modal-card">
           <template #default>
             <ImageMetadataEditor
@@ -160,10 +160,10 @@ import SlotHandler from './SlotHandler'
 import TypeSelector from './TypeSelector'
 import Types from './Types'
 import DropArea from './DropArea'
-import Description from './Description'
 import Tags from './Tags'
 
 import FocusPointEditor from './FocusPointEditor.vue'
+import ImageMetadataEditor from './ImageMetadataEditor.vue'
 import { ModalComponent } from 'vue-elder-modal'
 import { ButtonComponent } from 'vue-elder-button'
 import Card from '@kvass/card'
@@ -235,8 +235,8 @@ export default {
       id: null,
       selected: null,
       isDragOver: false,
-      isFocusEditorVisible: false,
       focusItem: null,
+      metadataEditingItem: null,
     }
   },
 
@@ -292,10 +292,8 @@ export default {
     },
     openFocusEditor(item) {
       this.focusItem = item
-      this.isFocusEditorVisible = true
     },
     closeFocusEditor() {
-      this.isFocusEditorVisible = false
       this.focusItem = null
     },
     saveFocusPoint(updatedItem) {
@@ -310,6 +308,27 @@ export default {
         this.$emit('input', cleanItem)
       }
       this.closeFocusEditor()
+    },
+    openMetadataEditor(item) {
+      this.metadataEditingItem = item
+    },
+    closeMetadataEditor() {
+      this.metadataEditingItem = null
+    },
+    saveMetadata(updatedItem) {
+      if (this.selected && this.selected.url === updatedItem.url) {
+        this.selected = updatedItem
+      }
+
+      const cleanItem = this.sanitizeItem(updatedItem)
+
+      if (this.multiple) {
+        const newValue = this.value.map((item) => (item.url === cleanItem.url ? cleanItem : item))
+        this.$emit('input', newValue)
+      } else {
+        this.$emit('input', cleanItem)
+      }
+      this.closeMetadataEditor()
     },
     draggableChange(val) {
       if (!val || !val.moved) return
@@ -361,9 +380,9 @@ export default {
     SlotHandler,
     TypeSelector,
     DropArea,
-    Description,
     Tags,
     FocusPointEditor,
+    ImageMetadataEditor,
     ModalComponent,
     ButtonComponent,
     Card,
@@ -387,7 +406,7 @@ export default {
     right: 0.75rem;
     z-index: 10;
     display: flex;
-    gap: .5rem;
+    gap: 0.5rem;
 
     &:empty {
       display: none;
@@ -400,6 +419,24 @@ export default {
     justify-content: center;
     width: 45px;
     height: 45px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    transition: all 0.2s;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+
+  &__info-trigger {
+    position: absolute;
+    z-index: 999;
+    top: 0.75rem;
+    right: 4.5rem;
+
+    display: flex;
+    height: 45px;
+    width: 45px;
     background-color: rgba(0, 0, 0, 0.5);
     color: white;
     transition: all 0.2s;
