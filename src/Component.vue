@@ -33,6 +33,7 @@
         <div class="kvass-media__actions">
           <ButtonComponent
             v-if="selectedIsImage && enableFocusPoint"
+            theme="primary"
             type="button"
             class="kvass-media__action-btn"
             :icon="['fas', 'wand-magic-sparkles']"
@@ -41,10 +42,19 @@
 
           <ButtonComponent
             v-if="selectedIsImage && enableAlt"
+            theme="primary"
             type="button"
             class="kvass-media__action-btn"
             :icon="['fas', 'message-text']"
             @click="openMetadataEditor(selected)"
+          />
+          <ButtonComponent
+            v-if="!selectedIsImage"
+            theme="primary"
+            type="button"
+            class="kvass-media__action-btn"
+            :icon="['fas', 'edit']"
+            @click="() => (editItem = selected)"
           />
         </div>
 
@@ -82,6 +92,14 @@
         @delete="remove(item)"
       />
     </Draggable>
+
+    <TypeEditor
+      v-if="currentTypeEdit"
+      :show.sync="currentTypeEdit"
+      :value="selectedSource"
+      :upload="upload"
+      @submit="update"
+    ></TypeEditor>
 
     <Portal>
       <ModalComponent :show="Boolean(focusItem)" @close="closeFocusEditor">
@@ -161,6 +179,7 @@ import { ButtonComponent } from 'vue-elder-button'
 import Card from '@kvass/card'
 import { Portal } from '@linusborg/vue-simple-portal'
 import { Options } from '../index'
+import TypeEditor from './TypeEditor.vue'
 
 export default {
   props: {
@@ -229,10 +248,20 @@ export default {
       isDragOver: false,
       focusItem: null,
       metadataEditingItem: null,
+      editItem: null,
     }
   },
 
   computed: {
+    currentTypeEdit: {
+      get() {
+        if (this.selectedIsImage || !this.selected || !this.editItem) return
+        return this.selected.typeConfig
+      },
+      set() {
+        this.editItem = null
+      },
+    },
     hasImage() {
       return this.typesComp.some((item) => item.name === 'Image')
     },
@@ -341,6 +370,19 @@ export default {
       if (this.selected.url === item.url) this.$nextTick(() => this.select())
     },
 
+    update(updateItem) {
+      const cleanItem = this.sanitizeItem(updateItem)
+
+      if (this.multiple) {
+        const newValue = this.value.map((item) => (item.url === this.selected.url ? cleanItem : item))
+
+        this.$emit('input', newValue)
+      } else {
+        this.$emit('input', cleanItem)
+      }
+      this.editItem = null
+    },
+
     addItem(item) {
       let value = this.value || []
       this.$emit('input', this.multiple ? [...value, ...[item]] : item)
@@ -379,6 +421,7 @@ export default {
     ButtonComponent,
     Card,
     Portal,
+    TypeEditor,
   },
 }
 </script>
@@ -411,8 +454,7 @@ export default {
     justify-content: center;
     width: 45px;
     height: 45px;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
+
     transition: all 0.2s;
 
     &:hover {

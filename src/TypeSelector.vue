@@ -1,7 +1,6 @@
 <template>
   <div v-if="!hasOnlyImage" class="kvass-media-type-selector">
     <span class="kvass-media-type-selector__info">{{ hasImage ? `${label.selectMessage}` : label.selectMessage }}</span>
-
     <DropdownComponent>
       <ButtonComponent :label="label.select" icon="plus" type="button" class="kvass-media-type-selector__action" />
       <template #dropdown>
@@ -13,46 +12,16 @@
         />
       </template>
     </DropdownComponent>
-    <Portal>
-      <div>
-        <ModalComponent :show="Boolean(show)" @close="show = null" class="kvass-media-type-selector__modal">
-          <Card theme="flat" tag="form" @submit.prevent="submit">
-            <template #default>
-              <component
-                v-if="show"
-                :is="show.components.Create"
-                :is-valid.sync="isValid"
-                :upload="upload"
-                ref="creator"
-                v-on="$listeners"
-              />
-            </template>
-            <template #footer>
-              <ButtonComponent :label="label.cancel" type="button" @click="show = null" />
-              <ButtonComponent
-                theme="primary"
-                :disabled="!isValid"
-                :promise="promise"
-                :label="label.save"
-                type="submit"
-                @onSuccess="show = null"
-              />
-            </template>
-          </Card>
-        </ModalComponent>
-      </div>
-    </Portal>
+
+    <TypeEditor :show.sync="show" :upload="upload" @submit="submit"></TypeEditor>
   </div>
 </template>
 
 <script>
 import { Options } from '../index'
-
-import { ModalComponent } from 'vue-elder-modal'
 import { ButtonComponent } from 'vue-elder-button'
-import Card from '@kvass/card'
 import { DropdownComponent } from 'vue-elder-dropdown'
-import { Portal } from '@linusborg/vue-simple-portal'
+import TypeEditor from './TypeEditor.vue'
 
 export default {
   props: {
@@ -63,8 +32,6 @@ export default {
   data() {
     return {
       show: null,
-      promise: null,
-      isValid: true,
     }
   },
   computed: {
@@ -78,11 +45,8 @@ export default {
     },
   },
   methods: {
-    submit() {
-      if (!this.isValid) return
-      this.promise = this.$refs.creator.prepareData().then((data) => {
-        this.$emit('add', data)
-      })
+    submit(data) {
+      this.$emit('add', data)
     },
     open(item) {
       if (item.name === 'Image') return this.$parent.$refs.input.click()
@@ -90,11 +54,9 @@ export default {
     },
   },
   components: {
-    ModalComponent,
-    Card,
     ButtonComponent,
     DropdownComponent,
-    Portal,
+    TypeEditor,
   },
 }
 </script>
@@ -115,11 +77,6 @@ export default {
 
   &__info {
     margin-bottom: 0.5rem;
-  }
-
-  .kvass-card {
-    max-width: 700px;
-    width: 100%;
   }
 }
 </style>
