@@ -31,6 +31,7 @@ const Options = {
     focusPointTitle: 'Focus Point Previews',
     focusPointDescription: 'How the image will be cropped in different layouts.',
     resetFocusPoint: 'Reset focus point',
+    typeLimitReached: (type) => `You can only add ${type.max} ${type.name} per field`,
   },
 }
 
