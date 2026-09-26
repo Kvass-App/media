@@ -12,7 +12,6 @@
     "vue-elder-dropdown": "^1.5.6",
     "vue-elder-input": "^1.9.3",
     "vue-elder-modal": "^1.0.5",
-    "vue-youtube": "^1.4.0",
     "vuedraggable": "^2.24.3"
   },
   "devDependencies": {
