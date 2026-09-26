@@ -26,7 +26,7 @@
       :upload="upload"
     >
       <template #default>
-        <TypeSelector :value="typesComp" @add="addItem" :has-image="hasImage" />
+        <TypeSelector :value="typesComp" :items="items" @add="addItem" :has-image="hasImage" />
       </template>
 
       <template v-if="selected" #preview>

@@ -8,7 +8,9 @@
           :is="item.components.CreateTrigger"
           v-for="item in value"
           :key="item.name"
-          @click.native="open(item)"
+          v-tooltip="isFull(item) ? label.typeLimitReached(item) : null"
+          :class="{ 'kvass-media-type-selector__trigger--disabled': isFull(item) }"
+          @click.native="!isFull(item) && open(item)"
         />
       </template>
     </DropdownComponent>
@@ -26,6 +28,7 @@ import TypeEditor from './TypeEditor.vue'
 export default {
   props: {
     value: Array,
+    items: Array,
     upload: Function,
     hasImage: Boolean,
   },
@@ -47,6 +50,9 @@ export default {
   methods: {
     submit(data) {
       this.$emit('add', data)
+    },
+    isFull(type) {
+      return Boolean(type.max) && this.items.filter(type.condition).length >= type.max
     },
     open(item) {
       if (item.name === 'Image') return this.$parent.$refs.input.click()
@@ -72,6 +78,11 @@ export default {
     button {
       padding: 0.5rem;
       justify-content: space-between;
+    }
+
+    .kvass-media-type-selector__trigger--disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
   }
 

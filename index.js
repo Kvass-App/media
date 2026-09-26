@@ -31,6 +31,7 @@ const Options = {
     focusPointTitle: 'Focus Point Previews',
     focusPointDescription: 'How the image will be cropped in different layouts.',
     resetFocusPoint: 'Reset focus point',
+    typeLimitReached: (type) => `You can only add ${type.max} ${type.name} per field`,
   },
 }
 
@@ -40,8 +41,11 @@ const install = (Vue) => {
 
 const setup = (options) => {
   for (let key in options) {
-    if (!(key in Options)) return
-    Options[key] = options[key]
+    if (!(key in Options)) {
+      console.warn(`[@kvass/media]: Unknown option "${key}"`)
+      continue
+    }
+    Options[key] = key === 'labels' ? { ...Options.labels, ...options.labels } : options[key]
   }
 }
 
