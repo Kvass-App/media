@@ -40,8 +40,11 @@ const install = (Vue) => {
 
 const setup = (options) => {
   for (let key in options) {
-    if (!(key in Options)) return
-    Options[key] = options[key]
+    if (!(key in Options)) {
+      console.warn(`[@kvass/media]: Unknown option "${key}"`)
+      continue
+    }
+    Options[key] = key === 'labels' ? { ...Options.labels, ...options.labels } : options[key]
   }
 }
 
